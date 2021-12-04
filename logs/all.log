@@ -1,1 +1,4 @@
 time="2021-12-04T16:52:07+02:00" level=info msg="run localhost:8080" func="main.main()" file="main.go:20"
+time="2021-12-04T17:27:55+02:00" level=info msg="run localhost:8080" func="main.main()" file="main.go:26"
+time="2021-12-04T17:48:06+02:00" level=info msg="run localhost:8080" func="main.main()" file="main.go:29"
+time="2021-12-04T17:49:29+02:00" level=info msg="run localhost:8080" func="main.main()" file="main.go:29"
