@@ -1,0 +1,1 @@
+time="2021-12-04T16:52:07+02:00" level=info msg="run localhost:8080" func="main.main()" file="main.go:20"
