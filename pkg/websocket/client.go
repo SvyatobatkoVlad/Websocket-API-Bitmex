@@ -13,7 +13,6 @@ type Client struct {
 	WsServer         *WsServer
 	BitmexClient *Bitmex.WebsocketClient
 	Subscription map[string]struct{}
-	send     chan []byte
 }
 
 const (
@@ -39,6 +38,7 @@ func (c *Client) Read() {
 		err = json.Unmarshal(p, command)
 		if err != nil {
 			c.WsServer.logger.Info("Invalid Message")
+			c.Conn.WriteJSON(p)
 		}
 
 		c.WsServer.logger.Infof("Got message from users to our app : %s", command)

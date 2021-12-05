@@ -3,6 +3,7 @@ package bitmex
 import (
 	"encoding/json"
 	"errors"
+	Auth "github.com/SvyatobatkoVlad/Websocket-API-Bitmex/internal/auth"
 	"github.com/SvyatobatkoVlad/Websocket-API-Bitmex/pkg/logging"
 	"github.com/gorilla/websocket"
 	"net/http/httputil"
@@ -14,8 +15,6 @@ import (
 var (
 	// ErrSetConnection if failed to set connection
 	ErrSetConnection = errors.New("error on set connection with Bitmex service")
-	// ErrCommandInvalid if command is invalid
-	ErrCommandInvalid = errors.New("error provided command is invalid for Bitmex")
 	// ErrSendMessage if message was not sent
 	ErrSendMessage = errors.New("error on send message to Bitmex")
 	// ErrReadMessage if message can not be read
@@ -81,20 +80,25 @@ func (w *WebsocketClient) SetConnection() (*WebsocketClient, error) {
 
 	w.logger.Info(string(dumpResp))
 
+	//@ToDo replace this for env variables
+	API_KEY := "ORqVaoVf1TJrVnKexpWjHfjk"
+	API_SECRET := "mvK7p-zYF5He2eistXxXUvASoJWRGvp6eOO5TF2gn4BHI2iB"
+
+	cmd, err := Auth.WebsocketAuthCommand(API_KEY,API_SECRET)
+	if err != nil {
+		w.logger.Fatalf("auth connect not work! c: %s", err.Error())
+	}
+
+	err = w.wsConn.WriteJSON(cmd)
+	if err != nil {
+		w.logger.Warning("error on write JSON to websocket external server for Auth: ", err)
+	}
+
 	return w, nil
 }
 
 // SendCommand to send command to the websocket server
 func (w *WebsocketClient) SendCommand(message Command) error {
-	//validate := validator.New()
-	//err := validate.Struct(message)
-	//if err != nil {
-	//	for _, e := range err.(validator.ValidationErrors) {
-	//		log.Println(e)
-	//	}
-	//	return ErrCommandInvalid
-	//}
-
 	err := w.wsConn.WriteJSON(message)
 	if err != nil {
 		w.logger.Warning("error on write JSON to websocket external server: ", err)
@@ -112,7 +116,7 @@ func (w *WebsocketClient) ReadMessage() (*ResponseMessage, error) {
 		return nil, ErrReadMessage
 	}
 
-	//w.logger.Infof("got a message from Bitmex server to our app %s", msg)
+	w.logger.Infof("got a message from Bitmex server to our app %s", msg)
 
 	responseMessage := new(ResponseMessage)
 	err = json.Unmarshal(msg, responseMessage)

@@ -6,7 +6,6 @@ import (
 	websocketSruct "github.com/SvyatobatkoVlad/Websocket-API-Bitmex/pkg/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	_ "github.com/gorilla/websocket"
 	"net/http"
 )
 
