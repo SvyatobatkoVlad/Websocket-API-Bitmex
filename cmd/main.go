@@ -1,33 +1,41 @@
 package main
 
 import (
-	"github.com/SvyatobatkoVlad/Websocket-API-Bitmex/pkg/logging"
-	"github.com/gin-gonic/gin"
+	Internal "github.com/SvyatobatkoVlad/Websocket-API-Bitmex/internal"
 	Bitmex "github.com/SvyatobatkoVlad/Websocket-API-Bitmex/internal/bitmex"
+	"github.com/SvyatobatkoVlad/Websocket-API-Bitmex/internal/handler"
+	"github.com/SvyatobatkoVlad/Websocket-API-Bitmex/pkg/logging"
+	"github.com/SvyatobatkoVlad/Websocket-API-Bitmex/pkg/websocket"
+	"net/url"
 )
-
-func HomePage(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Hello World",
-	})
-}
 
 func main() {
 	logger := logging.GetLogger()
 
-	r := gin.Default()
-	r.LoadHTMLFiles("index.html")
+	urlToBitmexWebsocket := url.URL{
+		Scheme: "wss",
+		Host:   "ws.testnet.bitmex.com",
+		Path:   "/realtime",
+	}
 
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(200, "index.html", nil)
-	})
+	//initialize WebsocketClient
+	websocketClient := Bitmex.NewWebsocketClient(nil, urlToBitmexWebsocket, logger)
 
-	r.GET("/ws", func(c *gin.Context) {
-		Bitmex.Wshandler(c.Writer, c.Request)
-	})
+	websocketClient, err := websocketClient.SetConnection()
+	if err != nil {
+		logger.Fatal("error websocket connection was not set")
+	}
 
-	logger.Info("run localhost:8080")
-	r.Run()
+	wsServer := websocket.NewWebsocketServer()
+	go wsServer.Run()
+
+	go websocket.ListenBitmex(wsServer, websocketClient)
+
+	handler := new(handler.Handler)
+	srv := new(Internal.Server)
+	if err := srv.Run("8000", handler.InitRoutes(wsServer, websocketClient)); err != nil {
+		logger.Fatalf("error ocured while running http server: %s", err.Error())
+	}
 }
 
 
