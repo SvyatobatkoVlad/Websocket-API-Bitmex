@@ -41,10 +41,6 @@ func WebsocketAuthCommand(key, secret string) (*Command, error) {
 		return nil, err
 	}
 
-	//fmt.Println(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  sig", sig, "expires: ", req.expires.Unix() )
-	//{"op": "authKeyExpires", "args": ["ORqVaoVf1TJrVnKexpWjHfjk", 1638741658, "2333c8d56f1db38cfa6e5e3cd2992b78c96dd6dc07f80e549764a26342fa867c"]}
-	//{"action": "subscribe", "symbols": ["XBTUSDT"]}
-
 	cmd := &Command{
 		Op:   "authKeyExpires",
 		Args: []interface{}{key, req.expires.Unix(), sig},

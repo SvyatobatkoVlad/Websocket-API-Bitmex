@@ -5,6 +5,7 @@ import (
 	"errors"
 	Auth "github.com/SvyatobatkoVlad/Websocket-API-Bitmex/internal/auth"
 	"github.com/SvyatobatkoVlad/Websocket-API-Bitmex/pkg/logging"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/websocket"
 	"net/http/httputil"
 	"net/url"
@@ -13,6 +14,8 @@ import (
 
 
 var (
+	// ErrCommandInvalid if command is invalid
+	ErrCommandInvalid = errors.New("error provided command is invalid for Bitmex")
 	// ErrSetConnection if failed to set connection
 	ErrSetConnection = errors.New("error on set connection with Bitmex service")
 	// ErrSendMessage if message was not sent
@@ -80,7 +83,7 @@ func (w *WebsocketClient) SetConnection() (*WebsocketClient, error) {
 
 	w.logger.Info(string(dumpResp))
 
-	//@ToDo replace this for env variables
+	////@ToDo replace this for env variables
 	API_KEY := "ORqVaoVf1TJrVnKexpWjHfjk"
 	API_SECRET := "mvK7p-zYF5He2eistXxXUvASoJWRGvp6eOO5TF2gn4BHI2iB"
 
@@ -99,7 +102,16 @@ func (w *WebsocketClient) SetConnection() (*WebsocketClient, error) {
 
 // SendCommand to send command to the websocket server
 func (w *WebsocketClient) SendCommand(message Command) error {
-	err := w.wsConn.WriteJSON(message)
+	validate := validator.New()
+	err := validate.Struct(message)
+	if err != nil {
+		for _, e := range err.(validator.ValidationErrors) {
+			w.logger.Warning(e)
+		}
+		return ErrCommandInvalid
+	}
+
+	err = w.wsConn.WriteJSON(message)
 	if err != nil {
 		w.logger.Warning("error on write JSON to websocket external server: ", err)
 		return ErrSendMessage

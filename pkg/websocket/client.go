@@ -17,7 +17,7 @@ type Client struct {
 
 const (
 	sub = "subscribe"
-	unsub = "subscribe"
+	unsub = "unsubscribe"
 )
 
 
