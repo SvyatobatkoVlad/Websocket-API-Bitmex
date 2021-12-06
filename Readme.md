@@ -33,9 +33,39 @@ The "authKeyExpires" operation is used for authentication. The application immed
 1) https://testnet.bitmex.com/app/wsAPI
 2) https://testnet.bitmex.com/api/explorer/
 
+### Project structure
+```
+├── cmd
+│   └── main.go
+├── go.mod
+├── go.sum
+├── images
+│   ├── connect.png
+│   ├── subscribe.png
+│   └── unsubscribe.png
+├── internal
+│   ├── auth
+│   │   └── auth.go
+│   ├── bitmex
+│   │   ├── bitmex.go
+│   │   └── command.go
+│   ├── handler
+│   │   ├── handler.go
+│   │   └── serverWsBitMex.go
+│   └── server.go
+├── logs
+│   └── all.log
+├── pkg
+│   ├── logging
+│   │   └── logging.go
+│   └── websocket
+│       ├── client.go
+│       ├── server.go
+│       └── wsServer.go
+└── Readme.md
+```
 ### P.S
 Linters used(staticcheck), If my repository helped you then give it a star please :)
-
 
 
 
